@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import path from "path";
+import { fileURLToPath } from "url";
 
 import { connectDB } from "./lib/db.js";
 import authRoutes from "./routes/auth.route.js";
@@ -13,8 +14,9 @@ dotenv.config();
 
 const PORT = process.env.PORT || 5001;
 
-// THIS IS IMPORTANT
-const __dirname = path.resolve();
+// FIXED __dirname FOR ES MODULES
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 app.use(express.json());
 app.use(cookieParser());
@@ -35,10 +37,13 @@ app.use("/api/messages", messageRoutes);
 // PRODUCTION
 if (process.env.NODE_ENV === "production") {
 
-  const frontendPath = path.join(__dirname, "frontend", "dist");
+  // backend/src -> ../../frontend/dist
+  const frontendPath = path.join(__dirname, "../../frontend/dist");
 
+  // serve frontend
   app.use(express.static(frontendPath));
 
+  // react routes
   app.get(/(.*)/, (req, res) => {
     res.sendFile(path.join(frontendPath, "index.html"));
   });
