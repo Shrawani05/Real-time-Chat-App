@@ -35,14 +35,11 @@ app.use("/api/messages", messageRoutes);
 // PRODUCTION
 if (process.env.NODE_ENV === "production") {
 
-  // correct frontend dist path
   const frontendPath = path.join(__dirname, "frontend", "dist");
 
-  // serve static files
   app.use(express.static(frontendPath));
 
-  // react routing
-  app.get("/*", (req, res) => {
+  app.get(/(.*)/, (req, res) => {
     res.sendFile(path.join(frontendPath, "index.html"));
   });
 }
